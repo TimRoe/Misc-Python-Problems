@@ -1,0 +1,112 @@
+import time
+time.perf_counter()
+
+''' First attempt: Naive solution --- ~12.2 seconds for 10,001st prime'''
+
+'''def nthprime(n):
+    primes = [2]
+    i = 1
+    val = 3
+    while i < n:
+        for j in range(len(primes)):
+            if val % primes[j] != 0:
+                primecandidate = True
+            else:
+                primecandidate = False
+                break
+        if primecandidate == True:
+            primes.append(val)
+            i += 1
+        val += 2
+    return primes[n-1]'''
+
+''' Second attempt: Improved naive solution using property that divisors repeat after sqrt(n) --- ~.67 seconds for 10,001st prime
+                                                                                                  ~17.0 for 100,000'''
+'''def nthprime(n):
+    primes = [2, 3]
+    i = 2
+    val = 5
+    while i < n:
+        j = 0
+        while primes[j] <= val**0.5:
+            if val % primes[j] != 0:
+                primecandidate = True
+            else:
+                primecandidate = False
+                break
+            j += 1
+        if primecandidate == True:
+            primes.append(val)
+            i += 1
+        val += 2
+    return primes[n-1]'''
+
+''' Improved using Wikipedia's Primality test article (6k+/-1) --- ~.61 seconds for 10,001st prime; ~16.5 for 100,000'''
+
+def nthprime(n):
+    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31]
+    i = 9
+    k = 6
+    while i < n:
+        for l in range(-1, 2, 2):
+            val = 6*k + l
+            j = 2
+            while primes[j] <= val**0.5:
+                if val % primes[j] != 0:
+                    primecandidate = True
+                else:
+                    primecandidate = False
+                    break
+                j += 1
+            if primecandidate == True:
+                primes.append(val)
+                i += 1
+        k += 1
+    return primes[n-1]
+
+''' Continuing with Wikipedia's analysis leads to the Sieve of Eratosthenes --- ~.70 seconds to generate all primes less than 1,000,000
+
+    Implementation from http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python and modified to
+    be Python 3.3 instead of 2.7.8'''
+
+def sieveOfEratosthenes(n):
+    # Code from: <dickinsm@gmail.com>, Nov 30 2006
+    # http://groups.google.com/group/comp.lang.python/msg/f1f10ced88c68c2d
+    if n <= 2:
+        return []
+    sieve = list(range(3, n, 2))
+    top = len(sieve)
+    for si in sieve:
+        if si:
+            bottom = (si*si - 3) // 2
+            if bottom >= top:
+                break
+            sieve[bottom::si] = [0] * -((bottom - top) // si)
+    return [2] + [el for el in sieve if el]
+    
+''' Best method from SO w/o psyco (defunct) or numpy (modified to work with Python 3.3) --- ~.64 seconds for all primes under 1,000,000
+
+    When modified to return a single value, takes ~6.35 seconds to find any prime below 100,000,000.  Takes far longer returning all 
+    primes due to processing time spent printing the values to console, taking ~76 seconds to print all primes below 10,000,000.'''
+
+def rwh_primes2(n):
+    # http://stackoverflow.com/questions/2068372/fastest-way-to-list-all-primes-below-n-in-python/3035188#3035188
+    """ Input n>=6, Returns a list of primes, 2 <= p < n """
+    correction = (n%6>1)
+    n = {0:n,1:n-1,2:n+4,3:n+3,4:n+2,5:n+1}[n%6]
+    sieve = [True] * (n//3)
+    sieve[0] = False
+    for i in range(int(n**0.5)//3+1):
+      if sieve[i]:
+        k=3*i+1|1
+        sieve[      ((k*k)//3)      ::2*k]=[False]*((n//6-(k*k)//6-1)//k+1)
+        sieve[(k*k+4*k-2*k*(i&1))//3::2*k]=[False]*((n//6-(k*k+4*k-2*k*(i&1))//6-1)//k+1)
+    return [2,3] + [3*i+1|1 for i in range(1,n//3-correction) if sieve[i]]
+    #value = [2,3] + [3*i+1|1 for i in range(1,n//3-correction) if sieve[i]]
+    #return value[len(value) - 1]
+
+print('nth prime:', nthprime(10001))
+#print(sieveOfEratosthenes(1000000))
+#print(rwh_primes2(100000000))
+
+print("\n", time.perf_counter(), "seconds")
