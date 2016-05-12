@@ -1,0 +1,17 @@
+import time
+time.perf_counter()
+import sys
+sys.path.insert(0, 'D:\Application\Eclipse\Workspace\Project Euler\Problem 7')
+from ImportSeven import rwh_primes2
+
+''' Calculates the sum of prime numbers below n'''
+def sumofprimes(n):
+    primes = rwh_primes2(n)
+    psum = 0
+    for i in primes:
+        psum += i
+    return psum
+
+print(sumofprimes(2000000))
+
+print("\n", time.perf_counter(), "seconds")
