@@ -1,0 +1,18 @@
+import time
+time.perf_counter()
+
+''' Returns the Pythagorean triplet, if one exists, such that a + b + c = val'''
+def pythtrip(val):
+    for b in range(2, val//2 + 1):
+        a = 1
+        while a < b:
+            c = (a**2 + b**2)**.5
+            if c % 1 == 0:
+                #print("Pythagorean triple: ", [a, b, c])
+                if a + b + c == val:
+                    return [a, b, c]
+            a += 1
+
+print(pythtrip(1000))
+
+print("\n", time.perf_counter(), "seconds")
