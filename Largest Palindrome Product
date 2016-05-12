@@ -1,0 +1,30 @@
+import time
+time.process_time()
+
+def palindrome(n):
+    i = 1
+    m = str(n)
+    while i <= len(m)//2:
+        if m[i-1] == m[len(m)-i]:
+            i += 1
+        else:
+            return False
+    return True
+
+def productpalindrome(n):
+    maxpal = 1
+    min = 10**(len(str(n))-1)
+    for i in range(n, min, -1):
+        j = i
+        while maxpal < i*j:
+            if palindrome(i*j) == True:
+                maxpal = i*j
+            elif j < min:
+                break
+            else:
+                j -= 1
+    return maxpal
+
+print(productpalindrome(999))
+
+print("\n", time.process_time(), "seconds")
