@@ -1,0 +1,58 @@
+import time
+time.process_time()
+
+primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]       # Primes under 30, insert a prime generator (Euler Problem 7) to n if using n > 30
+
+def primemultiple(n):                               # Based on primes only being divisible by themselves and 1, ...
+    i = 0                                           #      all primes <= n multiplied together form a lower bound for smallest multiple
+    minmultiple = 1
+    while primes[i] <= n:
+        minmultiple = minmultiple*primes[i]
+        i += 1
+    return minmultiple
+
+'''
+First implementation, realized a better implementation below
+
+def smallestmultiple1ton(n):                        # Function to find the smallest value that divides all numbers 1 to n
+    multiple = False
+    min = primemultiple(n)
+    small = min - min % n                           # Rounding the value off to the nearest lower n divisible value 
+    # Rounding off to the nearest lower n allows making jumps of n size which in turn reduces the number of necessary test cases by a 
+    # factor of n; it also ensures the values checked are already divisible by n, negating the necessity to check n divisibility each 
+    # iteration
+    while multiple == False:
+        for i in range(n-1, 2, -1):                 # Checking if n-1 down to 2 for each candidate solution is divisible ...
+            div = small / i                         #     not checking n every time reduced time to calculate from ~17.3 to ~13.4 seconds
+            if div % 1 == 0:                        # Checking if an integer value after division
+                multiple = True
+            else:
+                small += n
+                multiple = False
+                break
+    return small
+    
+    
+Second implementation realizes that the primemultiple function is not just a lower bound, but rather that the solution must, by the
+properties of prime numbers, be a multiple of this number.
+
+This realization reduced time to calculate from ~13.4 seconds to less than a tenth of a second'''
+
+def smallestmultiple(n):
+    multiple = False
+    min = primemultiple(n)
+    small = min
+    while multiple == False:
+        for i in range(n, 2, -1):
+            div = small / i
+            if div % 1 == 0:
+                multiple = True
+            else:
+                small += min
+                multiple = False
+                break
+    return small
+    
+print(smallestmultiple(20))                     # 1 to 20 is the Project Euler problem
+
+print("\n", time.process_time(), "seconds")
